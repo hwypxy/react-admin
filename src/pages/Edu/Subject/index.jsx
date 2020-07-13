@@ -1,92 +1,32 @@
 import React, { Component } from "react"
-import { Table, Button } from "antd"
+import { Table, Button, Tooltip, Input } from "antd"
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons"
 
 import { connect } from "react-redux"
 
-// import { reqGetSubjectList } from "@api/edu/subject"
-
-import { getSubjectList } from "./redux"
+import { getSubjectList, getSecSubjectList } from "./redux"
 
 import "./index.less"
 
-const columns = [
-  { title: "课程分类", dataIndex: "title", key: "name" },
-  {
-    title: "操作",
-    dataIndex: "",
-    key: "x",
-    render: () => (
-      <>
-        <Button type="primary" style={{ marginRight: 20 }}>
-          <FormOutlined />
-        </Button>
-        <Button type="danger">
-          <DeleteOutlined />
-        </Button>
-      </>
-    ),
-    width: 400,
-    align: "center",
-  },
-]
-
-const data = [
-  {
-    key: 1,
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    description:
-      "My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.",
-  },
-  {
-    key: 2,
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    description:
-      "My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.",
-  },
-  {
-    key: 3,
-    name: "Not Expandable",
-    age: 29,
-    address: "Jiangsu No. 1 Lake Park",
-    description: "This not expandable",
-  },
-  {
-    key: 4,
-    name: "Joe Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-    description:
-      "My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.",
-  },
-]
-
-@connect((state) => ({ subjectList: state.subjectList }), { getSubjectList })
+@connect((state) => ({ subjectList: state.subjectList }), {
+  getSubjectList,
+  getSecSubjectList,
+})
 class Subject extends Component {
-  // state = {
-  //   size: "large",
-  // }
-
+  // 当前页码
   currentPage = 1
+
+  state = {
+    subjectId: "",
+    subjectTitle: "",
+  }
 
   // 加载完的生命周期
   componentDidMount() {
     this.props.getSubjectList(1, 10)
   }
 
-  //获取subject数据
-  // getSubjectList = async (page, limit) => {
-  //   const res = await getSubjectList(page, limit)
-  //   this.setState({
-  //     subject: res,
-  //   })
-  // }
-
-  //页码数
+  // 页码数
   handlePageChange = (page, pageSize) => {
     this.props.getSubjectList(page, pageSize)
     this.currentPage = page
@@ -98,31 +38,128 @@ class Subject extends Component {
     this.currentPage = current
   }
 
-  // //按钮大小
-  // handleSizeChange = (e) => {
-  //   this.setState({ size: e.target.value })
-  // }
+  // 跳转添加课程分类页面
+  handleGoAddSubject = () => {
+    this.props.history.push("/edu/subject/add")
+  }
+
+  // 点击+展示二级菜单
+  handleClickExpand = (expanded, record) => {
+    if (expanded) {
+      this.props.getSecSubjectList(record._id)
+    }
+  }
+
+  // 分类名称改变时
+  handleTitleChange = (e) => {
+    this.setState({
+      subjectTitle: e.target.value,
+    })
+  }
+
+  // 点击编辑按钮进行数据更新
+  handleUpdateClick = (value) => {
+    return () => {
+      this.setState({
+        subjectId: value._id,
+        subjectTitle: value.title,
+      })
+    }
+  }
+
+  // 取消编辑操作
+  handleCancel = () => {
+    this.setState({
+      subjectId: "",
+    })
+  }
+
+  // 确定提交更新后的数据
+  handleCommit = () => {}
+
   render() {
-    // const { size } = this.state
+    // 表格参数
+    const columns = [
+      {
+        title: "课程分类",
+        // dataIndex: "title",
+        key: "title",
+        render: (value) => {
+          if (this.state.subjectId === value._id) {
+            return (
+              <Input
+                style={{ width: 500 }}
+                value={this.state.subjectTitle}
+                onChange={this.handleTitleChange}
+              />
+            )
+          }
+          return <span>{value.title}</span>
+        },
+      },
+      {
+        title: "操作",
+        // dataIndex: "",
+        key: "x",
+        render: (value) => {
+          if (this.state.subjectId === value._id) {
+            return (
+              <>
+                <Button
+                  type="primary"
+                  style={{ marginRight: 20 }}
+                  onClick={this.handleCommit}
+                >
+                  确认
+                </Button>
+                <Button type="danger" onClick={this.handleCancel}>
+                  取消
+                </Button>
+              </>
+            )
+          }
+          return (
+            <>
+              <Tooltip title={"修改课程"}>
+                {/* 表格修改按钮 */}
+                <Button
+                  type="primary"
+                  style={{ marginRight: 20 }}
+                  onClick={this.handleUpdateClick(value)}
+                >
+                  <FormOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title={"删除课程"}>
+                {/* 表格删除按钮 */}
+                <Button type="danger">
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            </>
+          )
+        },
+        width: 400,
+        align: "center",
+      },
+    ]
+
     return (
       <>
         <Button
           type="primary"
           shape="round"
           icon={<PlusOutlined />}
-          // size={size}
           style={{ marginBottom: 20 }}
+          onClick={this.handleGoAddSubject}
         >
-          新建
+          {/* 新建 */}
         </Button>
         <Table
           className={"table"}
           columns={columns}
           expandable={{
-            expandedRowRender: (record) => (
-              <p style={{ margin: 0 }}>{record.description}</p>
-            ),
-            rowExpandable: (record) => record.name !== "Not Expandable",
+            onExpand: this.handleClickExpand,
           }}
           dataSource={this.props.subjectList.items}
           rowKey="_id"
@@ -131,7 +168,7 @@ class Subject extends Component {
             showQuickJumper: true,
             showSizeChanger: true,
             pageSizeOptions: ["5", "10", "15", "20"],
-            // defaultPageSize: 5, //每页默认显示数据条数
+            // defaultPageSize: 5,
             onChange: this.handlePageChange,
             onShowSizeChange: this.handleSizeChange,
             current: this.currentPage,
