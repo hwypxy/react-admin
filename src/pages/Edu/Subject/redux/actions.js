@@ -1,6 +1,16 @@
-import { reqGetSubjectList, reqGetSecSubjectList } from "@api/edu/subject"
+import {
+  reqGetSubjectList,
+  reqGetSecSubjectList,
+  reqUpdateSubject,
+  reqDeleteSubject,
+} from "@api/edu/subject"
 
-import { GET_SUBJECT_LIST, GET_SECSUBJECT_LIST } from "./constants"
+import {
+  GET_SUBJECT_LIST,
+  GET_SECSUBJECT_LIST,
+  UPDATE_SUBJECT,
+  DELETE_SUBJECT,
+} from "./constants"
 
 // 获取一级分类同步action
 const getSubjectListSync = (list) => ({
@@ -28,6 +38,21 @@ export const getSecSubjectList = (parentId) => {
     return reqGetSecSubjectList(parentId).then((response) => {
       dispatch(getSecSubjectListSync(response))
       return response
+    })
+  }
+}
+
+// 更新数据
+const updateSubjectSync = (data) => ({
+  type: UPDATE_SUBJECT,
+  data,
+})
+
+export const updateSubject = (title, id) => {
+  return (dispatch) => {
+    reqUpdateSubject(title, id).then((res) => {
+      dispatch(updateSubjectSync({ title, id }))
+      return res
     })
   }
 }

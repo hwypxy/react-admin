@@ -21,3 +21,13 @@ export function reqGetSecSubjectList(parentId) {
 export function reqAddSecSubjectList(title, parentId) {
   return request.post(`${BASE_URL}/save`, { title, parentId })
 }
+
+// 更新数据
+export function reqUpdateSubject(title, id) {
+  return request.put(`${BASE_URL}/update`, { title, id })
+}
+
+// 删除数据
+export function reqDelSubject(id) {
+  return request.delete(`${BASE_URL}/remove/${id}`)
+}

@@ -1,20 +1,31 @@
 import React, { Component } from "react"
-import { Table, Button, Tooltip, Input } from "antd"
-import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons"
+import { Table, Button, Tooltip, Input, message, Modal } from "antd"
+import {
+  PlusOutlined,
+  FormOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons"
 
 import { connect } from "react-redux"
 
-import { getSubjectList, getSecSubjectList } from "./redux"
+import { getSubjectList, getSecSubjectList, updateSubject } from "./redux"
+
+import { reqDelSubject } from "@api/edu/subject"
 
 import "./index.less"
+
+const { confirm } = Modal
 
 @connect((state) => ({ subjectList: state.subjectList }), {
   getSubjectList,
   getSecSubjectList,
+  updateSubject,
 })
 class Subject extends Component {
   // 当前页码
   currentPage = 1
+  pageSize = 10
 
   state = {
     subjectId: "",
@@ -23,7 +34,7 @@ class Subject extends Component {
 
   // 加载完的生命周期
   componentDidMount() {
-    this.props.getSubjectList(1, 10)
+    this.props.getSubjectList(1, this.pageSize)
   }
 
   // 页码数
@@ -33,9 +44,10 @@ class Subject extends Component {
   }
 
   // 每页条数
-  handleSizeChange = (current, pageSize) => {
-    this.props.getSubjectList(current, pageSize)
+  handleSizeChange = (current, size) => {
+    this.props.getSubjectList(current, size)
     this.currentPage = current
+    this.pageSize = size
   }
 
   // 跳转添加课程分类页面
@@ -64,18 +76,74 @@ class Subject extends Component {
         subjectId: value._id,
         subjectTitle: value.title,
       })
+      this.oldSubjectTitle = value.title
     }
   }
 
   // 取消编辑操作
-  handleCancel = () => {
+  handleCancel = (e) => {
     this.setState({
       subjectId: "",
+      subjectTitle: "",
     })
   }
 
   // 确定提交更新后的数据
-  handleCommit = () => {}
+  handleUpdate = async () => {
+    let { subjectTitle, subjectId } = this.state
+    if (subjectTitle.length) {
+      if (this.oldSubjectTitle !== subjectTitle) {
+        await this.props.updateSubject(subjectTitle, subjectId)
+        message.success("更新成功")
+        this.handleCancel()
+      } else {
+        message.error("内容没有修改哦！")
+        this.handleCancel()
+      }
+    } else {
+      message.error("课程名称不能为空")
+    }
+  }
+
+  // 删除数据
+  handleDeleteSubject = (value) => {
+    return () => {
+      confirm({
+        title: (
+          <>
+            <div>
+              确定删除
+              <span style={{ color: "red", fontSize: 30 }}>{value.title}</span>
+              吗？
+            </div>
+          </>
+        ),
+        icon: <ExclamationCircleOutlined />,
+        onOk: async () => {
+          await reqDelSubject(value._id)
+          message.success("删除成功")
+          const totalPage = Math.ceil(
+            this.props.subjectList.total / this.pageSize
+          )
+          const lastPageSize = this.props.subjectList.total % this.pageSize
+          // console.log("currentPage", this.currentPage)
+          // console.log("当前数据长度", this.props.subjectList.items.length)
+          // console.log("totalpage", totalPage)
+          console.log(this.props.subjectList.items.length)
+          if (
+            this.currentPage !== 1 &&
+            lastPageSize === 1 &&
+            totalPage === this.currentPage
+          ) {
+            console.log(111)
+            this.props.getSubjectList(--this.currentPage, this.pageSize)
+            return
+          }
+          this.props.getSubjectList(this.currentPage, this.pageSize)
+        },
+      })
+    }
+  }
 
   render() {
     // 表格参数
@@ -108,7 +176,7 @@ class Subject extends Component {
                 <Button
                   type="primary"
                   style={{ marginRight: 20 }}
-                  onClick={this.handleCommit}
+                  onClick={this.handleUpdate}
                 >
                   确认
                 </Button>
@@ -132,7 +200,7 @@ class Subject extends Component {
               </Tooltip>
               <Tooltip title={"删除课程"}>
                 {/* 表格删除按钮 */}
-                <Button type="danger">
+                <Button type="danger" onClick={this.handleDeleteSubject(value)}>
                   <DeleteOutlined />
                 </Button>
               </Tooltip>
@@ -171,7 +239,7 @@ class Subject extends Component {
             // defaultPageSize: 5,
             onChange: this.handlePageChange,
             onShowSizeChange: this.handleSizeChange,
-            current: this.currentPage,
+            current: this.currentPage, //当前页码数
           }}
         />
       </>

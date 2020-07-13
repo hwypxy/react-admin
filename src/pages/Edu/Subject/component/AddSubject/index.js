@@ -49,6 +49,8 @@ class AddSubject extends Component {
 
   //提交按钮
   onFinish = async (values) => {
+    console.log(values.parentId)
+    console.log(values.subjectName)
     try {
       await reqAddSecSubjectList(values.subjectName, values.parentId)
       message.success("课程分类添加成功！")
@@ -61,7 +63,6 @@ class AddSubject extends Component {
   // 获取更多数据
   handleloadMore = async () => {
     const res = await reqGetSubjectList(this.page++, this.limit)
-    console.log(res)
     const newItems = [...this.state.subjectList.items, ...res.items]
     this.setState({
       subjectList: {
