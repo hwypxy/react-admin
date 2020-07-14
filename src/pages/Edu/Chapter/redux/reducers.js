@@ -11,7 +11,7 @@ export default function chapterList(state = initChapterList, action) {
       action.data.items.forEach((item) => {
         item.children = []
       })
-      console.log(action.data)
+      // console.log(action.data)
       return action.data
     case GET_LESSON_LIST:
       if (action.data.length) {
@@ -20,7 +20,7 @@ export default function chapterList(state = initChapterList, action) {
             item.children = action.data
           }
         })
-        console.log(action.data)
+        // console.log(action.data)
       }
       return { ...state }
     default:

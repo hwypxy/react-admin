@@ -17,6 +17,10 @@ import { connect } from "react-redux"
 import SearchForm from "./SearchForm"
 import { getLessonList } from "./redux"
 
+import { reqRemoveLesson } from "@api/edu/lesson"
+
+import Player from "griffith"
+
 import "./index.less"
 
 dayjs.extend(relativeTime)
@@ -38,6 +42,8 @@ class Chapter extends Component {
     previewVisible: false,
     previewImage: "",
     selectedRowKeys: [],
+    visible: false,
+    video: "",
   }
 
   showImgModal = (img) => {
@@ -53,11 +59,6 @@ class Chapter extends Component {
     this.setState({
       previewVisible: false,
     })
-  }
-
-  componentDidMount() {
-    // const { page, limit } = this.state;
-    // this.handleTableChange(page, limit);
   }
 
   handleTableChange = (page, limit) => {
@@ -94,27 +95,59 @@ class Chapter extends Component {
 
   // 点击+ 展示子列表
   handleClickExpand = (expanded, record) => {
-    console.log("图标", record._id)
+    // console.log("图标", record._id)
     if (expanded) {
       this.props.getLessonList(record._id)
     }
   }
 
   //跳转新增课程页面
-  goToAddLess = () => {
-    this.props.history.push("/edu/chapter/addlesson")
+  goToAddLess = (data) => () => {
+    this.props.history.push("/edu/chapter/addlesson", data)
+  }
+
+  // 删除课时
+  delLesson = (data) => async () => {
+    console.log(data._id)
+    const lessonId = data._id
+    await reqRemoveLesson(lessonId)
+  }
+
+  // 显示视频预览模态框
+  showModal = (video) => () => {
+    console.log(video)
+    this.setState({
+      visible: true,
+      video,
+    })
+  }
+
+  // 关闭视频模态框
+  handleCancel = (e) => {
+    this.setState({
+      visible: false,
+    })
   }
 
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state
 
+    const sources = {
+      hd: {
+        play_url: this.state.video,
+        bitrate: 1,
+        duration: 1000,
+        format: "",
+        height: 500,
+        width: 500,
+        size: 160000,
+      },
+    }
+
     const columns = [
       {
         title: "章节名称",
         dataIndex: "title",
-        // children: [
-
-        // ],
       },
       {
         title: "是否免费",
@@ -124,31 +157,62 @@ class Chapter extends Component {
         },
       },
       {
+        title: "视频",
+        // dataIndex: "free",
+        render: ({ free, video }) => {
+          //章节不展示
+          if (!free) return
+          // 课时才展示
+          return free === true && video ? (
+            <>
+              <Button onClick={this.showModal(video)}>预览</Button>
+              <Modal
+                title="视频"
+                visible={this.state.visible}
+                onCancel={this.handleCancel}
+                footer={null}
+                width={500}
+                destroyOnClose={true}
+              >
+                <Player
+                  sources={sources}
+                  id={"1"}
+                  cover={"http://localhost:3000/logo512.png"}
+                  duration={1000}
+                ></Player>
+              </Modal>
+            </>
+          ) : (
+            ""
+          )
+        },
+      },
+      {
         title: "操作",
         width: 300,
         fixed: "right",
         render: (data) => {
-          if ("free" in data) {
-            return (
-              <div>
-                <Tooltip title="查看详情">
-                  <Button>
-                    <SettingOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="更新章节">
-                  <Button type="primary" style={{ margin: "0 10px" }}>
-                    <FormOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="删除章节">
-                  <Button type="danger">
-                    <DeleteOutlined />
-                  </Button>
-                </Tooltip>
-              </div>
-            )
-          }
+          if ("free" in data) return
+          return (
+            <div>
+              <Tooltip title="新增课时">
+                <Button type="primary" onClick={this.goToAddLess(data)}>
+                  <PlusOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="更新章节">
+                <Button type="primary" style={{ margin: "0 10px" }}>
+                  <FormOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="删除章节" onClick={this.delLesson(data)}>
+                <Button type="danger">
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            </div>
+          )
+          // }
         },
       },
     ]
@@ -227,11 +291,7 @@ class Chapter extends Component {
           <div className="course-table-header">
             <h3>课程章节列表</h3>
             <div>
-              <Button
-                type="primary"
-                style={{ marginRight: 10 }}
-                onClick={this.goToAddLess}
-              >
+              <Button type="primary" style={{ marginRight: 10 }}>
                 <PlusOutlined />
                 <span>新增</span>
               </Button>

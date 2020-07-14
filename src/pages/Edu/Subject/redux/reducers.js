@@ -15,7 +15,6 @@ export default function subjectList(state = initSubjectList, action) {
       action.data.items.forEach((item) => {
         item.children = []
       })
-      // console.log(state.items.length)
       return action.data
     case GET_SECSUBJECT_LIST:
       if (action.data.items.length > 0) {

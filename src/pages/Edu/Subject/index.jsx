@@ -25,6 +25,7 @@ const { confirm } = Modal
 class Subject extends Component {
   // 当前页码
   currentPage = 1
+  //每页条数
   pageSize = 10
 
   state = {
@@ -34,7 +35,10 @@ class Subject extends Component {
 
   // 加载完的生命周期
   componentDidMount() {
-    this.props.getSubjectList(1, this.pageSize)
+    this.props.getSubjectList(this.currentPage, this.pageSize)
+    setTimeout(() => {
+      console.log("页面渲染完获取的数据：", this.props.subjectList)
+    }, 3000)
   }
 
   // 页码数
@@ -132,10 +136,10 @@ class Subject extends Component {
           console.log(this.props.subjectList.items.length)
           if (
             this.currentPage !== 1 &&
+            // this.props.subjectList.items.length === 1 &&
             lastPageSize === 1 &&
             totalPage === this.currentPage
           ) {
-            console.log(111)
             this.props.getSubjectList(--this.currentPage, this.pageSize)
             return
           }
