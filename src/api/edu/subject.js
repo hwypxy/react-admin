@@ -31,3 +31,8 @@ export function reqUpdateSubject(title, id) {
 export function reqDelSubject(id) {
   return request.delete(`${BASE_URL}/remove/${id}`)
 }
+
+//获取所有一级课程分类数据
+export function reqAllSubjectList() {
+  return request.get(`${BASE_URL}`)
+}

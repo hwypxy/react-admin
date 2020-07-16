@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { Button, message, Tooltip, Modal, Alert, Table } from "antd"
+import { Button, message, Tooltip, Modal, Alert, Table, Carousel } from "antd"
 import {
   FullscreenOutlined,
   RedoOutlined,
@@ -15,11 +15,13 @@ import relativeTime from "dayjs/plugin/relativeTime"
 
 import { connect } from "react-redux"
 import SearchForm from "./SearchForm"
-import { getLessonList } from "./redux"
+import { getLessonList, batchDelChapter, batchDelLesson } from "./redux"
 
-import { reqRemoveLesson } from "@api/edu/lesson"
-
+// 播放器
 import Player from "griffith"
+
+// 导入全屏的包
+import screenfull from "screenfull"
 
 import "./index.less"
 
@@ -34,7 +36,7 @@ dayjs.extend(relativeTime)
     // )
     chapterList: state.chapterList,
   }),
-  { getLessonList }
+  { getLessonList, batchDelChapter, batchDelLesson }
 )
 class Chapter extends Component {
   state = {
@@ -93,6 +95,11 @@ class Chapter extends Component {
     })
   }
 
+  // handleSelect = (record, selected, selectedRows, nativeEvent) => {
+  //   console.log(111)
+  //   console.log(record, selected, selectedRows, nativeEvent)
+  // }
+
   // 点击+ 展示子列表
   handleClickExpand = (expanded, record) => {
     // console.log("图标", record._id)
@@ -106,20 +113,20 @@ class Chapter extends Component {
     this.props.history.push("/edu/chapter/addlesson", data)
   }
 
-  // 删除课时
-  delLesson = (data) => async () => {
-    console.log(data._id)
-    const lessonId = data._id
-    await reqRemoveLesson(lessonId)
-  }
-
   // 显示视频预览模态框
   showModal = (video) => () => {
-    console.log(video)
-    this.setState({
-      visible: true,
-      video,
-    })
+    // console.log("Modal0:", video)
+    const videoString = video.split(",")
+    console.log("Modal1:", videoString)
+    this.setState(
+      {
+        visible: true,
+        video: videoString,
+      },
+      () => {
+        console.log("Modal2:", this.state.video)
+      }
+    )
   }
 
   // 关闭视频模态框
@@ -128,21 +135,73 @@ class Chapter extends Component {
       visible: false,
     })
   }
+  handleClick = (e) => {
+    console.log("click ", e)
+    this.setState({ current: e.key })
+  }
+
+  // 批量删除
+  handleBatchDel = () => {
+    Modal.confirm({
+      title: "确定删除吗？",
+      onOk: async () => {
+        // 储存选中章节Id
+        let chapterIds = []
+        // 储存选中课时Id
+        let lessonIds = []
+
+        // 拿到选中id
+        let selectedRowKeys = this.state.selectedRowKeys
+        // 拿到章节数据
+        let chapterList = this.props.chapterList.items
+        // console.log(chapterList)
+        chapterList.forEach((chapter) => {
+          // 章节Id
+          let chapterId = chapter._id
+
+          let index = selectedRowKeys.indexOf(chapterId)
+          console.log("index", index)
+          if (index > -1) {
+            let newArry = selectedRowKeys.splice(index, 1)
+            chapterIds.push(newArry[0])
+          }
+        })
+        lessonIds = [...selectedRowKeys]
+
+        // console.log("chapterIds:", chapterIds)
+        // console.log("lessonIds:", lessonIds)
+
+        //调用接口 删除章节
+        if (chapterIds) await this.props.batchDelChapter(chapterIds)
+        if (lessonIds) await this.props.batchDelLesson(lessonIds)
+      },
+    })
+  }
+
+  // 全屏
+  handlescreenFull = () => {
+    screenfull.toggle()
+  }
 
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state
 
-    const sources = {
-      hd: {
-        play_url: this.state.video,
-        bitrate: 1,
-        duration: 1000,
-        format: "",
-        height: 500,
-        width: 500,
-        size: 160000,
-      },
-    }
+    // 视频格式参数
+    let sources =
+      this.state.video &&
+      this.state.video.map((item, index) => ({
+        hd: {
+          play_url: item,
+          bitrate: 1,
+          duration: 1000,
+          format: "",
+          height: 500,
+          width: 500,
+          size: 160000,
+        },
+      }))
+
+    // console.log("videoUrlArr", sources)
 
     const columns = [
       {
@@ -162,6 +221,8 @@ class Chapter extends Component {
         render: ({ free, video }) => {
           //章节不展示
           if (!free) return
+
+          // console.log(video)
           // 课时才展示
           return free === true && video ? (
             <>
@@ -173,13 +234,23 @@ class Chapter extends Component {
                 footer={null}
                 width={500}
                 destroyOnClose={true}
+                centered
               >
-                <Player
-                  sources={sources}
-                  id={"1"}
-                  cover={"http://localhost:3000/logo512.png"}
-                  duration={1000}
-                ></Player>
+                {this.state.video && (
+                  <Carousel dotPosition="top">
+                    {this.state.video.map((item, index) => (
+                      <div key={index}>
+                        <Player
+                          sources={sources[index]}
+                          // play_ur={item}
+                          id={item}
+                          cover={"http://localhost:3000/logo512.png"}
+                          duration={1000}
+                        ></Player>
+                      </div>
+                    ))}
+                  </Carousel>
+                )}
               </Modal>
             </>
           ) : (
@@ -191,22 +262,25 @@ class Chapter extends Component {
         title: "操作",
         width: 300,
         fixed: "right",
+        align: "right",
         render: (data) => {
-          if ("free" in data) return
+          // if ("free" in data) return
           return (
             <div>
-              <Tooltip title="新增课时">
-                <Button type="primary" onClick={this.goToAddLess(data)}>
-                  <PlusOutlined />
-                </Button>
-              </Tooltip>
+              {data.free === undefined && (
+                <Tooltip title="新增课时">
+                  <Button type="primary" onClick={this.goToAddLess(data)}>
+                    <PlusOutlined />
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="更新章节">
                 <Button type="primary" style={{ margin: "0 10px" }}>
                   <FormOutlined />
                 </Button>
               </Tooltip>
-              <Tooltip title="删除章节" onClick={this.delLesson(data)}>
-                <Button type="danger">
+              <Tooltip title="删除章节">
+                <Button type="danger" style={{ marginRight: "20%" }}>
                   <DeleteOutlined />
                 </Button>
               </Tooltip>
@@ -247,6 +321,8 @@ class Chapter extends Component {
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
+      // onSelect: this.handleSelect,
+      // type: "checkbox ",
       // hideDefaultSelections: true,
       // selections: [
       //   Table.SELECTION_ALL,
@@ -295,10 +371,18 @@ class Chapter extends Component {
                 <PlusOutlined />
                 <span>新增</span>
               </Button>
-              <Button type="danger" style={{ marginRight: 10 }}>
+              <Button
+                type="danger"
+                style={{ marginRight: 10 }}
+                onClick={this.handleBatchDel}
+              >
                 <span>批量删除</span>
               </Button>
-              <Tooltip title="全屏" className="course-table-btn">
+              <Tooltip
+                title="全屏"
+                className="course-table-btn"
+                onClick={this.handlescreenFull}
+              >
                 <FullscreenOutlined />
               </Tooltip>
               <Tooltip title="刷新" className="course-table-btn">
@@ -322,7 +406,9 @@ class Chapter extends Component {
             style={{ marginBottom: 20 }}
           />
           <Table
+            className="table"
             rowSelection={rowSelection}
+            // onChange={this.handleOnChange}
             columns={columns}
             dataSource={this.props.chapterList.items}
             rowKey="_id"

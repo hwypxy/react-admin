@@ -10,7 +10,7 @@ const MAX_VIDEO_SIZE = 20 * 1024 * 1024
 export default class MyUpload extends Component {
   constructor() {
     super()
-
+    this.videoArr = []
     // 获取本地uploadToken的数据
     const str = localStorage.getItem("uploadToken")
     // 判断数据是否已存在
@@ -31,10 +31,14 @@ export default class MyUpload extends Component {
     }
   }
 
+  componentDidMount() {
+    this.videoArr = []
+  }
+
   // 储存uploadToken和过期时间的方法
   saveUploadToken = (uploadToken, expires) => {
     // 获取token的生命周期
-    const targetTime = Date.now() + expires * 1000
+    const targetTime = Date.now() + expires * 1000 - 2 * 60 * 1000
     expires = targetTime
     const upload_token = JSON.stringify({ uploadToken, expires })
     // 储存数据到本地localStorage
@@ -68,10 +72,6 @@ export default class MyUpload extends Component {
 
   // 上传视频时调用
   handleCustomRequest = (value) => {
-    // console.log(value)
-    // console.log("file", file)
-    // console.log(value)
-    // console.log(value)
     const file = value.file
     const key = nanoid(10)
     const token = this.state.uploadToken
@@ -98,10 +98,11 @@ export default class MyUpload extends Component {
       // 上传成功
       complete: (res) => {
         value.onSuccess(res)
-        let data = data.push("http://qdcdb1qpp.bkt.clouddn.com/" + res.key)
-        console.log(data)
+        this.videoArr.push("http://qdcdb1qpp.bkt.clouddn.com/" + res.key)
+        // console.log("成功后：", this.videoArr)
         // console.log(this.props.onChange)
-        this.props.onChange("http://qdcdb1qpp.bkt.clouddn.com/" + res.key)
+        // this.props.onChange("http://qdcdb1qpp.bkt.clouddn.com/" + res.key)
+        this.props.onChange(this.videoArr)
       },
     }
     // 上传开始
@@ -109,7 +110,7 @@ export default class MyUpload extends Component {
   }
 
   //   componentDidMount() {
-  //     console.log(this.props.num)
+  //     console.log(this-+.props.num)
   //     console.log(this.props.onChange)
   //   }
 

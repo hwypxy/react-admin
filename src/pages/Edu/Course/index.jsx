@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Button, message, Table, Tooltip, Modal } from "antd";
+import React, { Component } from "react"
+import { Button, message, Table, Tooltip, Modal } from "antd"
 import {
   FormOutlined,
   DeleteOutlined,
@@ -9,14 +9,15 @@ import {
   // FullscreenExitOutlined,
   RedoOutlined,
   SettingOutlined,
-} from "@ant-design/icons";
+} from "@ant-design/icons"
 
-import { connect } from "react-redux";
-import SearchForm from "./SearchForm";
+import { connect } from "react-redux"
+import SearchForm from "./SearchForm"
+
 // import { getCourseList } from "./redux";
 
 // import { filterPermissions } from "@utils/permission";
-import "./index.less";
+import "./index.less"
 
 @connect(
   (state) => ({
@@ -36,21 +37,21 @@ class Course extends Component {
     limit: 5, // 每页显示条数
     previewVisible: false,
     previewImage: "",
-  };
+  }
 
   search = (searchName) => {
     this.setState({
       searchLoading: true,
-    });
+    })
 
-    const { page, limit } = this.state;
+    const { page, limit } = this.state
 
     this.getcourseList({ Coursename: searchName, page, limit }).finally(() => {
       this.setState({
         searchLoading: false,
-      });
-    });
-  };
+      })
+    })
+  }
 
   renderTableItem = () => {
     // const { permissionValueList } = this.props;
@@ -73,23 +74,23 @@ class Course extends Component {
           </Button>
         </Tooltip>
       </div>
-    );
-  };
+    )
+  }
 
   showImgModal = (img) => {
     return () => {
       this.setState({
         previewVisible: true,
         previewImage: img,
-      });
-    };
-  };
+      })
+    }
+  }
 
   handleImgModal = () => {
     this.setState({
       previewVisible: false,
-    });
-  };
+    })
+  }
 
   columns = [
     {
@@ -181,7 +182,7 @@ class Course extends Component {
       width: 200,
       fixed: "right",
     },
-  ];
+  ]
 
   componentDidMount() {
     // const { page, limit } = this.state;
@@ -191,28 +192,28 @@ class Course extends Component {
   handleTableChange = (page, limit) => {
     this.setState({
       tableLoading: true,
-    });
+    })
 
     this.getcourseList({ page, limit }).finally(() => {
       this.setState({
         tableLoading: false,
         page,
         limit,
-      });
-    });
-  };
+      })
+    })
+  }
 
   getcourseList = ({ page, limit, Coursename, nickName }) => {
     return this.props
       .getcourseList({ page, limit, Coursename, nickName })
       .then((total) => {
         if (total === 0) {
-          message.warning("暂无用户列表数据");
-          return;
+          message.warning("暂无用户列表数据")
+          return
         }
-        message.success("获取用户列表数据成功");
-      });
-  };
+        message.success("获取用户列表数据成功")
+      })
+  }
 
   render() {
     const {
@@ -221,7 +222,7 @@ class Course extends Component {
       tableLoading,
       previewVisible,
       previewImage,
-    } = this.state;
+    } = this.state
 
     const courseList = [
       {
@@ -625,10 +626,10 @@ class Course extends Component {
       return {
         ...item,
         index: index + 1,
-      };
-    });
+      }
+    })
 
-    const total = courseList.length;
+    const total = courseList.length
 
     return (
       <div>
@@ -682,8 +683,8 @@ class Course extends Component {
           <img alt="example" style={{ width: "100%" }} src={previewImage} />
         </Modal>
       </div>
-    );
+    )
   }
 }
 
-export default Course;
+export default Course

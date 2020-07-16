@@ -39,21 +39,16 @@ export default class AddLesson extends Component {
 
   // 表单提交时
   onFinish = (value) => {
-    // console.log(values)
-    // console.log(this.props.location.state._id)
-
-    // chapterId, value.title, values.free, value.video
+    console.log("字符串", value.video)
     const chapterId = this.props.location.state._id
 
-    const { title, free, video } = value
+    const { title, free } = value
+    const videoArr = value.video
+    const video = videoArr.join(",")
+    console.log("onFinish:", video)
     reqAddLesson({ chapterId, title, free, video })
     this.props.history.push("/edu/chapter/list")
   }
-
-  // // switch按钮改变时
-  // onChange = () => {
-  //   console.log(true)
-  // }
   render() {
     return (
       <div>
@@ -108,7 +103,6 @@ export default class AddLesson extends Component {
                 checkedChildren="开启"
                 unCheckedChildren="关闭"
                 defaultChecked
-                // onChange={this.onChange}
                 style={{ marginLeft: 20 }}
               />
             </Form.Item>
@@ -122,7 +116,7 @@ export default class AddLesson extends Component {
                 },
               ]}
             >
-              <MyUpload num="1" />
+              <MyUpload />
             </Form.Item>
 
             <Form.Item {...tailLayout}>

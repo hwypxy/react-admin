@@ -22,17 +22,33 @@ export const reqAddLesson = ({ chapterId, title, free, video }) => {
   })
 }
 
+//批量删除课时
+// export function reqBatchDelChapter(chapterIds) {
+//   return request.delete(`${BASE_URL}/batchRemove`, {
+//     data: { idList: chapterIds },
+//   })
+// }
+export function reqBatchDelLesson(chapterIds) {
+  return request({
+    url: `${BASE_URL}/batchRemove`,
+    method: "DELETE",
+    data: {
+      idList: chapterIds,
+    },
+  })
+}
+
 // 删除课时
 // export const reqRemoveLesson = (lessonId) => {
 //   return request.delete(`${BASE_URL}/remove/${lessonId}`)
 // }
 
-export const reqRemoveLesson = (lessonId) => {
-  return request({
-    url: `${BASE_URL}/remove/${lessonId}`,
-    method: "DELETE",
-    // data: {
-    //   lessonId,
-    // },
-  })
-}
+// export const reqRemoveLesson = (lessonId) => {
+//   return request({
+//     url: `${BASE_URL}/remove/${lessonId}`,
+//     method: "DELETE",
+//     // data: {
+//     //   lessonId,
+//     // },
+//   })
+// }

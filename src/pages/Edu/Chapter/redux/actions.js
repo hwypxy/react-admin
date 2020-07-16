@@ -1,7 +1,12 @@
-import { GET_CHAPTER_LIST, GET_LESSON_LIST } from "./constant"
+import {
+  GET_CHAPTER_LIST,
+  GET_LESSON_LIST,
+  BATCH_DEL_CHAPTER,
+  BATCH_DEL_LESSON,
+} from "./constant"
 
-import { reqGetChapterList } from "@api/edu/chapter"
-import { reqGetLessonList, reqRemoveLesson } from "@api/edu/lesson"
+import { reqGetChapterList, reqBatchDelChapter } from "@api/edu/chapter"
+import { reqGetLessonList, reqBatchDelLesson } from "@api/edu/lesson"
 
 // 获取章节列表同步action
 const getChapterListSync = (data) => ({
@@ -33,16 +38,31 @@ export function getLessonList(chapterId) {
   }
 }
 
-// const removeLessonSync = (data) => ({
-//   type: GET_LESSON_LIST,
-//   data,
-// })
-// //删除课时
-// export function removeLesson(lessonId) {
-//   return (dispatch) => {
-//     return reqRemoveLesson(lessonId).then((res) => {
-//       dispatch(removeLessonSync(res))
-//       return res
-//     })
-//   }
-// }
+const batchDelChapterSync = (data) => ({
+  type: BATCH_DEL_CHAPTER,
+  data,
+})
+//批量删除章节
+export function batchDelChapter(chapterIds) {
+  console.log(chapterIds)
+  return (dispatch) => {
+    return reqBatchDelChapter(chapterIds).then((res) => {
+      dispatch(batchDelChapterSync(chapterIds))
+      return res
+    })
+  }
+}
+
+const batchDelLessonSync = (data) => ({
+  type: BATCH_DEL_LESSON,
+  data,
+})
+//批量删除课时
+export function batchDelLesson(lessonIds) {
+  return (dispatch) => {
+    return reqBatchDelLesson(lessonIds).then((res) => {
+      dispatch(batchDelLessonSync(lessonIds))
+      return res
+    })
+  }
+}
