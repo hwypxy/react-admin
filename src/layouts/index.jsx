@@ -1,15 +1,15 @@
-import React, { Component } from "react";
+import React, { Component } from "react"
 
-import { connect } from "react-redux";
+import { connect } from "react-redux"
 
-import PrimaryLayout from "./PrimaryLayout";
-import PublicLayout from "./PublicLayout";
-import { Authorized } from "../components/Authorized";
+import PrimaryLayout from "./PrimaryLayout"
+import PublicLayout from "./PublicLayout"
+import { Authorized } from "../components/Authorized"
 
 @connect((state) => ({ token: state.token }))
 class BasicLayout extends Component {
   render() {
-    const { token } = this.props;
+    const { token } = this.props
 
     if (token) {
       // render props技术
@@ -17,14 +17,14 @@ class BasicLayout extends Component {
       return (
         <Authorized
           render={(routes) => {
-            return <PrimaryLayout routes={routes} />;
+            return <PrimaryLayout routes={routes} />
           }}
         />
-      );
+      )
     }
 
-    return <PublicLayout />;
+    return <PublicLayout />
   }
 }
 
-export default BasicLayout;
+export default BasicLayout
