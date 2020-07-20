@@ -6,7 +6,6 @@ import "./index.less"
 import {
   Chart,
   registerShape,
-  Geom,
   Axis,
   Tooltip,
   Interval,

@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { Card, Button, Form, Input, Switch, message } from "antd"
+import { Card, Button, Form, Input, Switch } from "antd"
 import { ArrowLeftOutlined } from "@ant-design/icons"
 
 import MyUpload from "../MyUpload"

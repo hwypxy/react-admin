@@ -3,19 +3,11 @@ import { Card, Tabs } from 'antd'
 
 import { RingProgressChart } from 'bizcharts'
 import {
-  G2,
   Chart,
   Geom,
   Axis,
   Tooltip,
-  Coord,
-  Label,
   Legend,
-  View,
-  Guide,
-  Shape,
-  Facet,
-  Util
 } from 'bizcharts'
 
 import './index.less'

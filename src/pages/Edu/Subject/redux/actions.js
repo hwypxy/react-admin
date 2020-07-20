@@ -2,14 +2,12 @@ import {
   reqGetSubjectList,
   reqGetSecSubjectList,
   reqUpdateSubject,
-  reqDeleteSubject,
 } from "@api/edu/subject"
 
 import {
   GET_SUBJECT_LIST,
   GET_SECSUBJECT_LIST,
   UPDATE_SUBJECT,
-  DELETE_SUBJECT,
 } from "./constants"
 
 // 获取一级分类同步action

@@ -291,32 +291,34 @@ class Chapter extends Component {
       },
     ]
 
-    const data = [
-      {
-        id: "111",
-        title: "第一章节",
-        children: [
-          {
-            id: "1",
-            title: "第一课时",
-            free: false,
-            videoSourceId: "756cf06db9cb4f30be85a9758b19c645",
-          },
-          {
-            id: "2",
-            title: "第二课时",
-            free: true,
-            videoSourceId: "2a02d726622f4c7089d44cb993c531e1",
-          },
-          {
-            id: "3",
-            title: "第三课时",
-            free: true,
-            videoSourceId: "4e560c892fdf4fa2b42e0671aa42fa9d",
-          },
-        ],
-      },
-    ]
+    //#region 
+    // const data = [
+    //   {
+    //     id: "111",
+    //     title: "第一章节",
+    //     children: [
+    //       {
+    //         id: "1",
+    //         title: "第一课时",
+    //         free: false,
+    //         videoSourceId: "756cf06db9cb4f30be85a9758b19c645",
+    //       },
+    //       {
+    //         id: "2",
+    //         title: "第二课时",
+    //         free: true,
+    //         videoSourceId: "2a02d726622f4c7089d44cb993c531e1",
+    //       },
+    //       {
+    //         id: "3",
+    //         title: "第三课时",
+    //         free: true,
+    //         videoSourceId: "4e560c892fdf4fa2b42e0671aa42fa9d",
+    //       },
+    //     ],
+    //   },
+    // ]
+    //#endregion
 
     const rowSelection = {
       selectedRowKeys,

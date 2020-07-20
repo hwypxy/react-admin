@@ -1,8 +1,6 @@
 import React from "react";
 import { Form, Input, Button, Select, Row, Col } from "antd";
 
-import { DownOutlined } from "@ant-design/icons";
-
 import DatePicker from "@comps/DatePicker";
 import "./index.less";
 
