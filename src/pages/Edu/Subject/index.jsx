@@ -133,7 +133,7 @@ class Subject extends Component {
           // console.log("currentPage", this.currentPage)
           // console.log("当前数据长度", this.props.subjectList.items.length)
           // console.log("totalpage", totalPage)
-          console.log(this.props.subjectList.items.length)
+          // console.log(this.props.subjectList.items.length)
           if (
             this.currentPage !== 1 &&
             // this.props.subjectList.items.length === 1 &&

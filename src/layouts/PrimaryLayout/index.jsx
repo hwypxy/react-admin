@@ -59,7 +59,15 @@ class PrimaryLayout extends Component {
     })
   }
 
+  // changeLanguage = (lang)  => {
+  //   console.log(111110)
+  //   return ()=>{
+  //     console.log(222)
+  //     console.log(lang)
+  //   }
+  // }
   changeLanguage = (lang) => async () => {
+    
     if (this.props.language === lang) return
 
     await this.props.languageChange(lang)
@@ -162,7 +170,7 @@ class PrimaryLayout extends Component {
           <Button
             block="true"
             type={this.state.language === "zh" ? "link" : "text"}
-            onClick={this.changeLanguage("zh")}
+            onClick={this.changeLanguage('zh')}
           >
             中文
           </Button>
