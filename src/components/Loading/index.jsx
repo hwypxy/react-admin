@@ -1,15 +1,15 @@
-import React, { Component } from "react";
-import { Spin } from "antd";
-import { connect } from "react-redux";
+import React, { Component } from "react"
+import { Spin } from "antd"
+import { connect } from "react-redux"
 
-import logo from "@assets/images/logo.png";
-import "./index.less";
+import logo from "@assets/images/logo.png"
+import "./index.less"
 
 @connect((state) => ({ loading: state.loading }))
 class Loading extends Component {
   render() {
-    const { loading } = this.props;
-
+    const { loading } = this.props
+    console.log("Loading...")
     if (loading) {
       return (
         <div className="loading" style={{ display: loading ? "flex" : "none" }}>
@@ -20,11 +20,11 @@ class Loading extends Component {
           <p>百万谷粉为你推荐的后台管理系统</p>
           <Spin size="large" />
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
-export default Loading;
+export default Loading
